@@ -1,0 +1,33 @@
+{
+  "name": "patchpilot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "An AI verified-fix agent that turns bug reports into failing regression tests, patches code, reruns tests, and writes repair reports.",
+  "bin": {
+    "patchpilot": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "start": "node dist/cli.js",
+    "demo": "npm run build && node dist/cli.js demo",
+    "demo:offline": "npm run build && node dist/cli.js demo --offline"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "diff": "^5.2.0",
+    "execa": "^9.5.2",
+    "openai": "^4.104.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.2.3",
+    "@types/node": "^20.17.50",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

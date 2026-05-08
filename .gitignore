@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.tmp/
+.env
+.patchpilot/
+coverage/
+npm-debug.log*

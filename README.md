@@ -1,5 +1,7 @@
 # PatchPilot
 
+[![Demo](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml/badge.svg)](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml)
+
 An AI verified-fix agent that turns bug reports into failing regression tests, patches code, reruns tests, and writes PR-ready repair reports.
 
 Demo GIF goes here.

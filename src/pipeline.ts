@@ -1,6 +1,6 @@
 import { mkdir, readFile, rm, cp } from "node:fs/promises";
 import path from "node:path";
-import type { PatchPilotMode } from "./config.js";
+import { getOpenAIModel, requireOpenAIKey, type PatchPilotMode } from "./config.js";
 import { selectRelevantFiles } from "./agents/fileSelector.js";
 import { planImplementationPatch } from "./agents/patchPlanner.js";
 import { writeRegressionTest } from "./agents/regressionTestWriter.js";
@@ -83,12 +83,23 @@ async function saveTrace(repoPath: string, trace: TraceRecorder, finalStatus: "p
 }
 
 export async function runPatchPilot(options: PipelineOptions): Promise<PipelineResult> {
+  requireOpenAIKey(options.mode);
+  const model = getOpenAIModel();
+  if (options.mode === "live") {
+    printStep("✔", "Live OpenAI mode enabled");
+    printStep("✔", `Using model: ${model}`);
+  } else {
+    printStep("✔", "Offline deterministic mode enabled");
+    printStep("✔", "Using canned structured outputs");
+    printStep("✔", "No OpenAI API key required");
+  }
+
   const repoPath = path.resolve(options.repoPath);
   const issueAbsolutePath = resolveIssuePath(repoPath, options.issuePath);
   const issueRelativePath = relativeToRepo(repoPath, issueAbsolutePath);
   const runId = createRunId();
   const artifactsDir = await prepareLatestRunArtifacts(repoPath);
-  const trace = new TraceRecorder(runId, options.mode, issueRelativePath, repoPath);
+  const trace = new TraceRecorder(runId, options.mode, issueRelativePath, repoPath, options.mode === "live" ? model : undefined);
 
   let issueText = "";
   let selection: FileSelection | undefined;
@@ -189,7 +200,12 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
         value: selected
       };
     });
-    printStep("✔", "Selected relevant files");
+    if (options.mode === "live") {
+      trace.recordOpenAICall("file_selection");
+      printStep("✔", "OpenAI file selection completed");
+    } else {
+      printStep("✔", "Selected relevant files");
+    }
     const selectedFiles = selection;
 
     regression = await trace.measure("generate_regression_test", preview(issueText), async () => {
@@ -209,7 +225,12 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
         value: generated
       };
     });
-    printStep("✔", "Generated regression test");
+    if (options.mode === "live") {
+      trace.recordOpenAICall("regression_test_generation");
+      printStep("✔", "OpenAI regression test generated");
+    } else {
+      printStep("✔", "Generated regression test");
+    }
     const generatedRegression = regression;
 
     await trace.measure("apply_regression_test", generatedRegression.file, async () => {
@@ -314,6 +335,10 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
         value: generated
       };
     });
+    if (options.mode === "live") {
+      trace.recordOpenAICall("implementation_patch_generation");
+      printStep("✔", "OpenAI implementation patch generated");
+    }
     const generatedImplementation = implementation;
 
     await trace.measure("apply_implementation_patch", generatedImplementation.file, async () => {

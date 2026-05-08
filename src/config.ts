@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 export type PatchPilotMode = "live" | "offline";
+export type Mode = PatchPilotMode;
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
@@ -39,6 +40,12 @@ export function getOpenAIModel(): string {
 
 export function hasOpenAIKey(): boolean {
   return Boolean(process.env.OPENAI_API_KEY);
+}
+
+export function requireOpenAIKey(mode: PatchPilotMode): void {
+  if (mode === "live" && !hasOpenAIKey()) {
+    throw new Error("Live mode requires OPENAI_API_KEY. Run npm run demo:offline for the deterministic demo.");
+  }
 }
 
 export function demoSourcePath(): string {

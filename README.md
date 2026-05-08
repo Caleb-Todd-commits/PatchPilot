@@ -59,6 +59,13 @@ The trace makes the system loop explicit:
 
 ```json
 {
+  "mode": "live",
+  "model": "gpt-4.1-mini",
+  "openaiCalls": [
+    "file_selection",
+    "regression_test_generation",
+    "implementation_patch_generation"
+  ],
   "steps": [
     { "name": "read_bug_report", "status": "passed" },
     { "name": "run_baseline_tests", "status": "passed" },
@@ -107,6 +114,8 @@ You can also run PatchPilot directly:
 npm run build
 node dist/cli.js run --repo ./demo-repo --issue ./demo-repo/issues/empty-cart.md --test "npm test"
 ```
+
+Add `--offline` to `run` for deterministic canned outputs without an API key.
 
 ## Architecture
 

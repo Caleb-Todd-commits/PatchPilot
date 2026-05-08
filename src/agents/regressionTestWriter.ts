@@ -50,10 +50,27 @@ export async function writeRegressionTest({
   const snippets = await readRepoSnippets(repoPath, selectedPaths);
 
   const regression = await generateStructured({
-    taskName: "regression_test_writer",
+    taskName: "regression_test_generation",
     schema: RegressionTestSchema,
-    instructions:
-      "Create a regression test for the bug by rewriting one test file in full. Preserve existing useful tests. Return JSON shaped as { file, testName, newFileContent, rationale }.",
+    system:
+      "You are PatchPilot's regression test generation agent. Return a full-file rewrite for one existing test file. Preserve existing imports and tests. Add only the minimum regression test needed. Use only paths that exist in the selected files. Do not include markdown.",
+    user: JSON.stringify(
+      {
+        instructions:
+          "Create a failing regression test for the reported bug by rewriting one test file in full. Return JSON shaped as { file, testName, newFileContent, rationale }.",
+        expectedShape: {
+          file: "tests/cart.test.ts",
+          testName: "returns 0 for an empty cart",
+          newFileContent: "full updated test file contents",
+          rationale: "Adds a regression test for the empty cart bug."
+        },
+        issueText,
+        selectedFiles: selection.relevantFiles,
+        snippets
+      },
+      null,
+      2
+    ),
     input: {
       issueText,
       selectedFiles: selection.relevantFiles,

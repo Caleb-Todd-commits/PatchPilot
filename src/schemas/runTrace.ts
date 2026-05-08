@@ -14,6 +14,8 @@ export const RunTraceSchema = z.object({
   startedAt: z.string(),
   completedAt: z.string(),
   mode: z.enum(["live", "offline"]),
+  model: z.string().optional(),
+  openaiCalls: z.array(z.string()),
   issuePath: z.string(),
   repoPath: z.string(),
   steps: z.array(TraceStepSchema),

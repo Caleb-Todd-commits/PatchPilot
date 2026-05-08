@@ -45,7 +45,9 @@ Open:
 
 ## What Proves OpenAI Is Used
 
-`npm run demo` uses live OpenAI mode for file selection, regression test generation, and implementation patch generation. The model outputs are validated with Zod before PatchPilot writes files. `npm run demo:offline` is the reproducibility demo and does not require an API key.
+`npm run demo` uses live OpenAI mode for file selection, regression test generation, and implementation patch generation. The terminal prints the enabled model and each OpenAI decision point as it completes. `trace.json` records `mode`, `model`, and `openaiCalls` without logging the API key.
+
+The model outputs are validated with Zod before PatchPilot writes files. `npm run demo:offline` is the reproducibility demo and does not require an API key.
 
 ## Known Limitations
 

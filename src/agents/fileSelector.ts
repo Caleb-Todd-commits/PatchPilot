@@ -42,8 +42,33 @@ export async function selectRelevantFiles({
   const selection = await generateStructured({
     taskName: "file_selection",
     schema: FileSelectionSchema,
-    instructions:
-      "Select the smallest set of source, test, and config files likely needed to reproduce and fix the bug. Return JSON shaped as { relevantFiles: [{ path, role, reason }] }.",
+    system:
+      "You are PatchPilot's file selection agent. Select the source and test files most relevant to the bug report. Use only paths that exist in the file tree. Do not invent file paths.",
+    user: JSON.stringify(
+      {
+        instructions:
+          "Select the smallest useful set of files for a verified fix. Prefer one source file and one existing test file. Include config only if needed. Return JSON shaped as { relevantFiles: [{ path, role, reason }] }.",
+        expectedShape: {
+          relevantFiles: [
+            {
+              path: "src/cart.ts",
+              role: "source",
+              reason: "Contains calculateTotal implementation."
+            },
+            {
+              path: "tests/cart.test.ts",
+              role: "test",
+              reason: "Contains cart total tests."
+            }
+          ]
+        },
+        issueText,
+        fileTree: interestingFiles,
+        snippets
+      },
+      null,
+      2
+    ),
     input: {
       issueText,
       files: interestingFiles,

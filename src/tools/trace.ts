@@ -5,6 +5,7 @@ import { RunTraceSchema } from "../schemas/runTrace.js";
 export class TraceRecorder {
   private readonly startedAt = new Date();
   private readonly steps: TraceStep[] = [];
+  private readonly openaiCalls: string[] = [];
   private completedAt?: Date;
   private finalStatus: "passed" | "failed" = "failed";
 
@@ -12,11 +13,18 @@ export class TraceRecorder {
     private readonly runId: string,
     private readonly mode: PatchPilotMode,
     private readonly issuePath: string,
-    private readonly repoPath: string
+    private readonly repoPath: string,
+    private readonly model?: string
   ) {}
 
   addStep(step: TraceStep): void {
     this.steps.push(step);
+  }
+
+  recordOpenAICall(taskName: string): void {
+    if (!this.openaiCalls.includes(taskName)) {
+      this.openaiCalls.push(taskName);
+    }
   }
 
   async measure<T>(
@@ -60,6 +68,8 @@ export class TraceRecorder {
       startedAt: this.startedAt.toISOString(),
       completedAt: (this.completedAt ?? new Date()).toISOString(),
       mode: this.mode,
+      model: this.model,
+      openaiCalls: this.openaiCalls,
       issuePath: this.issuePath,
       repoPath: this.repoPath,
       steps: this.steps,

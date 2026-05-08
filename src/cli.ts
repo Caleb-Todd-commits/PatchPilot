@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { Command } from "commander";
@@ -8,6 +9,7 @@ import {
   demoWorkspacePath,
   hasOpenAIKey,
   loadDotEnv,
+  requireOpenAIKey,
   type PatchPilotMode
 } from "./config.js";
 import { runPatchPilot, resetDemoWorkspace } from "./pipeline.js";
@@ -30,13 +32,8 @@ program
   .option("--offline", "use deterministic canned outputs instead of OpenAI")
   .action(async (options: { repo: string; issue: string; test: string; offline?: boolean }) => {
     const mode: PatchPilotMode = options.offline ? "offline" : "live";
-    if (mode === "live" && !hasOpenAIKey()) {
-      console.error("OPENAI_API_KEY is required for live mode. Use --offline for the deterministic demo path.");
-      process.exitCode = 1;
-      return;
-    }
-
     try {
+      requireOpenAIKey(mode);
       const result = await runPatchPilot({
         repoPath: options.repo,
         issuePath: options.issue,
@@ -55,18 +52,17 @@ program
   .description("Reset and run the included demo repo.")
   .option("--offline", "use deterministic canned outputs instead of OpenAI")
   .action(async (options: { offline?: boolean }) => {
-    const workspacePath = demoWorkspacePath();
-    await resetDemoWorkspace(demoSourcePath(), workspacePath);
-
     const mode: PatchPilotMode = options.offline ? "offline" : "live";
     if (mode === "live" && !hasOpenAIKey()) {
-      console.log("OPENAI_API_KEY is not set, so live demo mode cannot run.");
-      console.log("Use npm run demo:offline for the deterministic demo that requires no API key.");
+      console.error("Live demo requires OPENAI_API_KEY. Run npm run demo:offline for the deterministic demo.");
       process.exitCode = 1;
       return;
     }
 
     try {
+      requireOpenAIKey(mode);
+      const workspacePath = demoWorkspacePath();
+      await resetDemoWorkspace(demoSourcePath(), workspacePath);
       const result = await runPatchPilot({
         repoPath: workspacePath,
         issuePath: path.join(workspacePath, "issues", "empty-cart.md"),

@@ -37,15 +37,33 @@ export async function planImplementationPatch({
   }
 
   const sourceFiles = selection.relevantFiles
-    .filter((file) => file.role === "source")
+    .filter((file) => file.role === "source" || file.role === "test" || file.role === "config")
     .map((file) => file.path);
   const snippets = await readRepoSnippets(repoPath, sourceFiles);
 
   const patch = await generateStructured({
-    taskName: "implementation_patch",
+    taskName: "implementation_patch_generation",
     schema: ImplementationPatchSchema,
-    instructions:
-      "Fix the bug with the smallest implementation change by rewriting one source file in full. Return JSON shaped as { file, strategy: 'rewrite_file', newFileContent, rationale }.",
+    system:
+      "You are PatchPilot's implementation patch agent. Fix the bug with the smallest source change. Return a full-file rewrite for one existing source file. Preserve public API and unrelated behavior. Do not include markdown.",
+    user: JSON.stringify(
+      {
+        instructions:
+          "Generate the implementation fix. Return JSON shaped as { file, strategy: 'rewrite_file', newFileContent, rationale }. The strategy must be exactly 'rewrite_file'.",
+        expectedShape: {
+          file: "src/cart.ts",
+          strategy: "rewrite_file",
+          newFileContent: "full updated source file contents",
+          rationale: "Adds an initial accumulator value so empty carts return 0."
+        },
+        issueText,
+        selectedFiles: selection.relevantFiles,
+        failingTestOutput: testOutput.slice(0, 8000),
+        snippets
+      },
+      null,
+      2
+    ),
     input: {
       issueText,
       selectedFiles: selection.relevantFiles,

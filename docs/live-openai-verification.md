@@ -1,24 +1,27 @@
-# Live OpenAI Smoke Test
+# Live OpenAI Verification
 
 Live mode was run against the included demo repo with a local `OPENAI_API_KEY`.
 
-Default `empty-cart` result:
+## Empty Cart
 
 ```text
+Scenario: empty-cart
 ✔ Live OpenAI mode enabled
 ✔ Using model: gpt-4.1-mini
 ✔ OpenAI file selection completed
 ✔ OpenAI regression test generated
+✖ Confirmed regression test fails before fix
 ✔ OpenAI implementation patch generated
+✔ Applied implementation patch
+✔ Tests passed after fix
 
 PatchPilot Summary
 Verdict: PASS
 Mode: live
 Changed files: tests/cart.test.ts, src/cart.ts
-Artifacts: .tmp/demo-workspace/.patchpilot/runs/latest
 ```
 
-Optional `tax-discount-order` result:
+## Tax Discount Order
 
 ```text
 Scenario: tax-discount-order
@@ -37,7 +40,7 @@ Mode: live
 Changed files: tests/cart.test.ts, src/cart.ts
 ```
 
-What this proves:
+## What This Proves
 
 - PatchPilot can call the OpenAI Responses API in live mode.
 - `trace.json` records `mode: "live"`, `model: "gpt-4.1-mini"`, and the OpenAI call list.

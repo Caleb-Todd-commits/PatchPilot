@@ -1,32 +1,42 @@
 # PatchPilot
 
-[![Demo](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml/badge.svg)](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml)
+[![PatchPilot Proof](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml/badge.svg)](https://github.com/Caleb-Todd-commits/PatchPilot/actions/workflows/demo.yml)
 
 PatchPilot is an AI verified-fix agent that turns natural-language bug reports into failing regression tests, patches the code, reruns the test suite, and writes a PR-ready repair report.
 
 **Input:** a bug report  
 **Output:** a verified code fix with red-green test proof, trace artifacts, and a review-ready report.
 
-## 90-second demo
+## Judge Snapshot
 
-Demo GIF/video goes here.
+PatchPilot demonstrates a complete repair loop:
+
+```text
+Natural-language bug report
+-> baseline tests pass
+-> OpenAI generates a regression test
+-> generated test fails
+-> OpenAI patches the implementation
+-> final tests pass
+-> trace, diffs, logs, and report prove the run
+```
 
 ## Judges: Start Here
 
-Fast deterministic demo:
+Fast deterministic verification:
 
 ```bash
 npm install
 npm run demo:offline
 ```
 
-Optional second deterministic scenario:
+Second deterministic verification scenario:
 
 ```bash
 npm run demo:offline:tax-discount-order
 ```
 
-Live OpenAI demo:
+Live OpenAI verification:
 
 ```bash
 cp .env.example .env
@@ -45,7 +55,7 @@ Inspect the proof artifacts:
 
 A judge should understand the product in 10 seconds and run it in under 3 minutes.
 
-For a text version of the demo, see [docs/demo-transcript.md](docs/demo-transcript.md).
+For a concise evaluation summary, see [docs/submission-brief.md](docs/submission-brief.md).
 
 ## What It Does
 
@@ -109,9 +119,9 @@ For a local submission check, run:
 npm run quality
 ```
 
-## Offline Demo
+## Offline Verification
 
-`npm run demo:offline` is the reproducibility demo. It uses canned structured outputs for the included demo, but it still executes the real tool loop: file writes, baseline tests, failing generated regression test, implementation patch, final tests, trace, report, and diffs.
+`npm run demo:offline` is the reproducibility path. It uses canned structured outputs for the included scenario, but it still executes the real tool loop: file writes, baseline tests, failing generated regression test, implementation patch, final tests, trace, report, and diffs.
 
 Run the optional tax/discount ordering scenario with:
 
@@ -119,16 +129,16 @@ Run the optional tax/discount ordering scenario with:
 npm run demo:offline:tax-discount-order
 ```
 
-## Live OpenAI Run
+## Live OpenAI Verification
 
-`npm run demo` is the live OpenAI demo. Live mode uses OpenAI to:
+`npm run demo` is the live OpenAI path. Live mode uses OpenAI to:
 
 - select relevant files
 - generate a regression test
 - generate an implementation patch
 - verify the fix through the same baseline -> red -> green loop
 
-Live mode uses the OpenAI Responses API with `OPENAI_MODEL=gpt-4.1-mini` by default. Model outputs are requested as strict JSON and validated with Zod before PatchPilot touches the repo. Live mode was smoke-tested against the included demo repo; see [docs/live-smoke.md](docs/live-smoke.md).
+Live mode uses the OpenAI Responses API with `OPENAI_MODEL=gpt-4.1-mini` by default. Model outputs are requested as strict JSON and validated with Zod before PatchPilot touches the repo. Live mode was verified against both included scenarios; see [docs/live-openai-verification.md](docs/live-openai-verification.md).
 
 Run the optional live tax/discount scenario with:
 
@@ -189,7 +199,7 @@ flowchart LR
 
 ## Artifacts
 
-Demo runs copy `demo-repo` into `.tmp/demo-workspace` and write artifacts to:
+Verification runs copy `demo-repo` into `.tmp/demo-workspace` and write artifacts to:
 
 ```text
 .tmp/demo-workspace/.patchpilot/runs/latest/

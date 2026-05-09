@@ -2,14 +2,14 @@
 
 ## Run
 
-Fast deterministic demo, no API key:
+Fast deterministic verification, no API key:
 
 ```bash
 npm install
 npm run demo:offline
 ```
 
-Second deterministic scenario:
+Second deterministic verification scenario:
 
 ```bash
 npm run demo:offline:tax-discount-order
@@ -21,7 +21,7 @@ Full local quality gate:
 npm run quality
 ```
 
-Live OpenAI demo:
+Live OpenAI verification:
 
 ```bash
 cp .env.example .env

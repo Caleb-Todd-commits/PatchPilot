@@ -1,11 +1,11 @@
-name: Demo
+name: PatchPilot Proof
 
 on:
   push:
   pull_request:
 
 jobs:
-  demo-offline:
+  verified-repair:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
       - run: npm test
       - run: npm run demo:offline
       - name: Validate and summarize empty-cart proof
-        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Empty Cart Demo Result" node scripts/write-ci-summary.mjs
+        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Empty Cart Verification" node scripts/write-ci-summary.mjs
       - name: Upload empty-cart run artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -24,7 +24,7 @@ jobs:
           path: .tmp/demo-workspace/.patchpilot/runs/latest/
       - run: npm run demo:offline:tax-discount-order
       - name: Validate and summarize tax-discount-order proof
-        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Tax Discount Order Demo Result" node scripts/write-ci-summary.mjs
+        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Tax Discount Order Verification" node scripts/write-ci-summary.mjs
       - name: Upload tax-discount-order run artifacts
         uses: actions/upload-artifact@v4
         with:

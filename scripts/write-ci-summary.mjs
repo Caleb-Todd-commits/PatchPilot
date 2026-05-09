@@ -3,6 +3,7 @@ import { appendFile } from "node:fs/promises";
 import path from "node:path";
 
 const artifactsDir = process.argv[2] ?? ".tmp/demo-workspace/.patchpilot/runs/latest";
+const title = process.env.PATCHPILOT_SUMMARY_TITLE ?? "PatchPilot Demo Result";
 const requiredArtifacts = [
   "trace.json",
   "report.md",
@@ -57,7 +58,7 @@ if (trace.finalStatus !== "passed") {
   fail(`Trace finalStatus expected passed, got ${trace.finalStatus}`);
 }
 
-const summary = `# PatchPilot Demo Result
+const summary = `# ${title}
 
 | Stage | Result |
 |---|---|

@@ -20,6 +20,12 @@ npm install
 npm run demo:offline
 ```
 
+Optional second deterministic scenario:
+
+```bash
+npm run demo:offline:tax-discount-order
+```
+
 Live OpenAI demo:
 
 ```bash
@@ -46,6 +52,8 @@ For a text version of the demo, see [docs/demo-transcript.md](docs/demo-transcri
 PatchPilot reads a natural-language bug report, inspects a local JavaScript or TypeScript repo, selects likely source and test files, writes a regression test, confirms the test fails, patches the implementation, reruns tests, and saves a repair report with trace artifacts.
 
 The included demo repo has a cart total bug: `calculateTotal([])` crashes because the cart total logic assumes at least one item.
+
+It also includes an optional `tax-discount-order` scenario where checkout totals apply tax before discount. That scenario makes PatchPilot select across `src/cart.ts`, `src/discounts.ts`, `src/tax.ts`, and `tests/cart.test.ts`.
 
 ## Why this is not a prompt wrapper
 
@@ -93,7 +101,7 @@ The trace makes the system loop explicit:
 
 ## Quality Proof
 
-CI does more than run a passing build. After `npm run demo:offline`, `scripts/write-ci-summary.mjs` reads the generated `trace.json`, verifies the required artifacts exist, and fails the workflow unless the proof shows baseline tests passed, the generated regression test failed, the implementation patch was applied, and final tests passed.
+CI does more than run a passing build. It runs both deterministic scenarios, and after each run `scripts/write-ci-summary.mjs` reads the generated `trace.json`, verifies the required artifacts exist, and fails the workflow unless the proof shows baseline tests passed, the generated regression test failed, the implementation patch was applied, and final tests passed.
 
 For a local submission check, run:
 
@@ -105,6 +113,12 @@ npm run quality
 
 `npm run demo:offline` is the reproducibility demo. It uses canned structured outputs for the included demo, but it still executes the real tool loop: file writes, baseline tests, failing generated regression test, implementation patch, final tests, trace, report, and diffs.
 
+Run the optional tax/discount ordering scenario with:
+
+```bash
+npm run demo:offline:tax-discount-order
+```
+
 ## Live OpenAI Run
 
 `npm run demo` is the live OpenAI demo. Live mode uses OpenAI to:
@@ -115,6 +129,12 @@ npm run quality
 - verify the fix through the same baseline -> red -> green loop
 
 Live mode uses the OpenAI Responses API with `OPENAI_MODEL=gpt-4.1-mini` by default. Model outputs are requested as strict JSON and validated with Zod before PatchPilot touches the repo. Live mode was smoke-tested against the included demo repo; see [docs/live-smoke.md](docs/live-smoke.md).
+
+Run the optional live tax/discount scenario with:
+
+```bash
+npm run demo:tax-discount-order
+```
 
 Sanitized sample live artifacts are checked in at [docs/sample-live-run](docs/sample-live-run/):
 
@@ -145,6 +165,13 @@ node dist/cli.js run --repo ./demo-repo --issue ./demo-repo/issues/empty-cart.md
 ```
 
 Add `--offline` to `run` for deterministic canned outputs without an API key.
+
+To run the second scenario directly:
+
+```bash
+npm run build
+node dist/cli.js run --offline --repo ./demo-repo --issue ./demo-repo/issues/tax-discount-order.md --test "npm test"
+```
 
 ## Architecture
 

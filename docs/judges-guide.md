@@ -9,6 +9,12 @@ npm install
 npm run demo:offline
 ```
 
+Second deterministic scenario:
+
+```bash
+npm run demo:offline:tax-discount-order
+```
+
 Full local quality gate:
 
 ```bash
@@ -21,6 +27,12 @@ Live OpenAI demo:
 cp .env.example .env
 # add OPENAI_API_KEY to .env
 npm run demo
+```
+
+Optional live tax/discount scenario:
+
+```bash
+npm run demo:tax-discount-order
 ```
 
 ## Inspect
@@ -43,6 +55,7 @@ Open:
 - natural-language bug report is the input
 - baseline tests pass before any file changes
 - PatchPilot selects relevant files from a small repo with decoys
+- the optional tax/discount scenario selects across cart, discounts, and tax modules
 - PatchPilot writes a generated regression test
 - the generated regression test fails before the implementation fix
 - PatchPilot writes the implementation patch

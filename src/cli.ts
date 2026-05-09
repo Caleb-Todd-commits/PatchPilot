@@ -5,10 +5,13 @@ import path from "node:path";
 import { Command } from "commander";
 import {
   DEFAULT_TEST_COMMAND,
+  DEFAULT_DEMO_SCENARIO,
+  demoIssueFileName,
   demoSourcePath,
   demoWorkspacePath,
   hasOpenAIKey,
   loadDotEnv,
+  parseDemoScenario,
   requireOpenAIKey,
   type PatchPilotMode
 } from "./config.js";
@@ -51,7 +54,8 @@ program
   .command("demo")
   .description("Reset and run the included demo repo.")
   .option("--offline", "use deterministic canned outputs instead of OpenAI")
-  .action(async (options: { offline?: boolean }) => {
+  .option("--scenario <name>", "demo scenario to run: empty-cart or tax-discount-order", DEFAULT_DEMO_SCENARIO)
+  .action(async (options: { offline?: boolean; scenario: string }) => {
     const mode: PatchPilotMode = options.offline ? "offline" : "live";
     if (mode === "live" && !hasOpenAIKey()) {
       console.error("Live demo requires OPENAI_API_KEY. Run npm run demo:offline for the deterministic demo.");
@@ -60,12 +64,14 @@ program
     }
 
     try {
+      const scenario = parseDemoScenario(options.scenario);
       requireOpenAIKey(mode);
       const workspacePath = demoWorkspacePath();
       await resetDemoWorkspace(demoSourcePath(), workspacePath);
+      console.log(`Scenario: ${scenario}`);
       const result = await runPatchPilot({
         repoPath: workspacePath,
-        issuePath: path.join(workspacePath, "issues", "empty-cart.md"),
+        issuePath: path.join(workspacePath, "issues", demoIssueFileName(scenario)),
         testCommand: DEFAULT_TEST_COMMAND,
         mode
       });

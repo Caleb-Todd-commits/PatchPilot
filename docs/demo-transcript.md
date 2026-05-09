@@ -67,4 +67,12 @@ The important thing is not the canned offline AI output. The important thing is 
 npm run quality
 ```
 
-This runs the build, unit tests, offline demo, and latest-run inspection in one command. In CI, `scripts/write-ci-summary.mjs` also validates the generated trace and required artifacts before writing the GitHub Actions summary.
+This runs the build, unit tests, both offline demo scenarios, and latest-run inspection in one command. In CI, `scripts/write-ci-summary.mjs` also validates the generated trace and required artifacts before writing the GitHub Actions summary.
+
+## 5. Optional: Show The Tax/Discount Scenario
+
+```bash
+npm run demo:offline:tax-discount-order
+```
+
+This demonstrates that PatchPilot can select a small cluster of relevant modules instead of only one obvious file. The bug report says checkout totals must apply discount before tax and round the final total. PatchPilot selects `src/cart.ts`, `src/discounts.ts`, `src/tax.ts`, and `tests/cart.test.ts`, generates the 37.87 regression test, confirms it fails, patches the order of operations, and verifies the full suite passes.

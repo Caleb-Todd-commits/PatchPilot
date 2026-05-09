@@ -2,7 +2,7 @@
 
 Live mode was run against the included demo repo with a local `OPENAI_API_KEY`.
 
-Result:
+Default `empty-cart` result:
 
 ```text
 ✔ Live OpenAI mode enabled
@@ -16,6 +16,25 @@ Verdict: PASS
 Mode: live
 Changed files: tests/cart.test.ts, src/cart.ts
 Artifacts: .tmp/demo-workspace/.patchpilot/runs/latest
+```
+
+Optional `tax-discount-order` result:
+
+```text
+Scenario: tax-discount-order
+✔ Live OpenAI mode enabled
+✔ Using model: gpt-4.1-mini
+✔ OpenAI file selection completed
+✔ OpenAI regression test generated
+✖ Confirmed regression test fails before fix
+✔ OpenAI implementation patch generated
+✔ Applied implementation patch
+✔ Tests passed after fix
+
+PatchPilot Summary
+Verdict: PASS
+Mode: live
+Changed files: tests/cart.test.ts, src/cart.ts
 ```
 
 What this proves:

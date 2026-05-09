@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 export type PatchPilotMode = "live" | "offline";
 export type Mode = PatchPilotMode;
+export type DemoScenario = "empty-cart" | "tax-discount-order";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(currentFile);
@@ -11,6 +12,19 @@ const currentDir = path.dirname(currentFile);
 export const PROJECT_ROOT = path.resolve(currentDir, "..");
 export const DEFAULT_MODEL = "gpt-4.1-mini";
 export const DEFAULT_TEST_COMMAND = "npm test";
+export const DEFAULT_DEMO_SCENARIO: DemoScenario = "empty-cart";
+
+export function parseDemoScenario(value: string): DemoScenario {
+  if (value === "empty-cart" || value === "tax-discount-order") {
+    return value;
+  }
+
+  throw new Error(`Unknown demo scenario "${value}". Expected "empty-cart" or "tax-discount-order".`);
+}
+
+export function demoIssueFileName(scenario: DemoScenario): string {
+  return scenario === "tax-discount-order" ? "tax-discount-order.md" : "empty-cart.md";
+}
 
 export function loadDotEnv(root = PROJECT_ROOT): void {
   const envPath = path.join(root, ".env");

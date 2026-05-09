@@ -1,3 +1,7 @@
+export function roundCurrency(amount: number): number {
+  return Number(amount.toFixed(2));
+}
+
 export function calculateTax(subtotal: number, rate: number): number {
-  return Number((subtotal * rate).toFixed(2));
+  return roundCurrency(subtotal * rate);
 }

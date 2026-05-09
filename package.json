@@ -10,10 +10,12 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "quality": "npm run build && npm test && npm run demo:offline && npm run start -- inspect-runs",
+    "quality": "npm run build && npm test && npm run demo:offline && npm run demo:offline:tax-discount-order && npm run start -- inspect-runs",
     "start": "node dist/cli.js",
     "demo": "npm run build && node dist/cli.js demo",
-    "demo:offline": "npm run build && node dist/cli.js demo --offline"
+    "demo:offline": "npm run build && node dist/cli.js demo --offline",
+    "demo:tax-discount-order": "npm run build && node dist/cli.js demo --scenario tax-discount-order",
+    "demo:offline:tax-discount-order": "npm run build && node dist/cli.js demo --offline --scenario tax-discount-order"
   },
   "dependencies": {
     "commander": "^12.1.0",

@@ -88,6 +88,40 @@ async function saveTrace(repoPath: string, trace: TraceRecorder, finalStatus: "p
   await writeJsonArtifact(repoPath, "trace.json", snapshot);
 }
 
+function learnedRegressionForIssue(args: {
+  issueText: string;
+  issuePath: string;
+  selection: FileSelection;
+  regression: RegressionTest;
+  implementation: ImplementationPatch;
+  beforeFailed: boolean;
+  afterPassed: boolean;
+}): Record<string, unknown> {
+  const filesChanged = [args.implementation.file, args.regression.file];
+  const isTaxDiscountOrder = /tax/i.test(args.issueText) && /discount/i.test(args.issueText);
+
+  return {
+    bugPattern: isTaxDiscountOrder
+      ? "checkout total applies tax and discount in the wrong order"
+      : "empty collection reduce without initial value",
+    regressionTest: args.regression.testName,
+    filesChanged,
+    fixPattern: isTaxDiscountOrder
+      ? "apply discount to subtotal, clamp at zero, then apply tax and round final total"
+      : "provide initial accumulator value to reduce",
+    futureSignal: isTaxDiscountOrder
+      ? "watch total calculations where discounts, tax, clamping, and currency rounding interact"
+      : "watch for reduce calls without initial values on arrays that may be empty",
+    issuePath: args.issuePath,
+    selectedFiles: args.selection.relevantFiles,
+    testName: args.regression.testName,
+    testFile: args.regression.file,
+    implementationFile: args.implementation.file,
+    failureConfirmed: args.beforeFailed,
+    fixed: args.afterPassed
+  };
+}
+
 export async function runPatchPilot(options: PipelineOptions): Promise<PipelineResult> {
   requireOpenAIKey(options.mode);
   const model = getOpenAIModel();
@@ -401,20 +435,19 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
     }
 
     const finalStatus = beforeFailed && afterPassed ? "passed" : "failed";
-    await writeJsonArtifact(repoPath, "learned-regression.json", {
-      bugPattern: "empty collection reduce without initial value",
-      regressionTest: generatedRegression.testName,
-      filesChanged: [generatedImplementation.file, generatedRegression.file],
-      fixPattern: "provide initial accumulator value to reduce",
-      futureSignal: "watch for reduce calls without initial values on arrays that may be empty",
-      issuePath: issueRelativePath,
-      selectedFiles: selectedFiles.relevantFiles,
-      testName: generatedRegression.testName,
-      testFile: generatedRegression.file,
-      implementationFile: generatedImplementation.file,
-      failureConfirmed: beforeFailed,
-      fixed: afterPassed
-    });
+    await writeJsonArtifact(
+      repoPath,
+      "learned-regression.json",
+      learnedRegressionForIssue({
+        issueText,
+        issuePath: issueRelativePath,
+        selection: selectedFiles,
+        regression: generatedRegression,
+        implementation: generatedImplementation,
+        beforeFailed,
+        afterPassed
+      })
+    );
 
     const report = writeRepairReport({
       finalStatus,

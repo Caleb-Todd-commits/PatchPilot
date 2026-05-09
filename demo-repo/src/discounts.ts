@@ -7,3 +7,7 @@ export function applyDiscount(subtotal: number, code: DiscountCode = "NONE"): nu
 
   return subtotal;
 }
+
+export function applyFlatDiscount(subtotal: number, amount: number): number {
+  return Math.max(0, subtotal - amount);
+}

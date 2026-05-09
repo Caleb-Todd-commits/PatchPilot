@@ -31,6 +31,29 @@ describe("calculateTotal", () => {
 });
 `;
 
+const OFFLINE_TAX_DISCOUNT_TEST_CONTENT = `import { describe, expect, it } from "vitest";
+import { calculateCheckoutTotal, calculateTotal } from "../src/cart";
+
+describe("calculateTotal", () => {
+  it("calculates totals for normal carts", () => {
+    expect(
+      calculateTotal([
+        { price: 12, quantity: 2 },
+        { price: 5, quantity: 3 }
+      ])
+    ).toBe(39);
+  });
+
+  it("applies discount before tax and rounds the final total", () => {
+    expect(calculateCheckoutTotal([{ price: 19.99, quantity: 2 }], 5, 0.0825)).toBe(37.87);
+  });
+});
+`;
+
+function isTaxDiscountOrderIssue(issueText: string): boolean {
+  return /tax/i.test(issueText) && /discount/i.test(issueText);
+}
+
 export async function writeRegressionTest({
   mode,
   repoPath,
@@ -38,6 +61,15 @@ export async function writeRegressionTest({
   selection
 }: WriteRegressionTestArgs): Promise<RegressionTest> {
   if (mode === "offline") {
+    if (isTaxDiscountOrderIssue(issueText)) {
+      return RegressionTestSchema.parse({
+        file: "tests/cart.test.ts",
+        testName: "applies discount before tax and rounds the final total",
+        newFileContent: OFFLINE_TAX_DISCOUNT_TEST_CONTENT,
+        rationale: "The bug report defines discount-before-tax ordering and a concrete expected total of 37.87."
+      });
+    }
+
     return RegressionTestSchema.parse({
       file: "tests/cart.test.ts",
       testName: "returns 0 for an empty cart",
@@ -58,12 +90,19 @@ export async function writeRegressionTest({
       {
         instructions:
           "Create a failing regression test for the reported bug by rewriting one test file in full. The test should encode the Expected behavior from the bug report. Do not write a test that passes because it matches the Actual broken behavior. Return JSON shaped as { file, testName, newFileContent, rationale }.",
-        expectedShape: {
-          file: "tests/cart.test.ts",
-          testName: "returns 0 for an empty cart",
-          newFileContent: "full updated test file contents",
-          rationale: "Adds a regression test for the empty cart bug."
-        },
+        expectedShape: isTaxDiscountOrderIssue(issueText)
+          ? {
+              file: "tests/cart.test.ts",
+              testName: "applies discount before tax and rounds the final total",
+              newFileContent: "full updated test file contents",
+              rationale: "Adds a regression test for discount-before-tax ordering with the expected total 37.87."
+            }
+          : {
+              file: "tests/cart.test.ts",
+              testName: "returns 0 for an empty cart",
+              newFileContent: "full updated test file contents",
+              rationale: "Adds a regression test for the empty cart bug."
+            },
         issueText,
         selectedFiles: selection.relevantFiles,
         snippets

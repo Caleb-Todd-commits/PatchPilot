@@ -15,10 +15,18 @@ jobs:
       - run: npm install
       - run: npm test
       - run: npm run demo:offline
-      - name: Validate and summarize PatchPilot proof
-        run: node scripts/write-ci-summary.mjs
-      - name: Upload PatchPilot run artifacts
+      - name: Validate and summarize empty-cart proof
+        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Empty Cart Demo Result" node scripts/write-ci-summary.mjs
+      - name: Upload empty-cart run artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: patchpilot-demo-artifacts
+          name: patchpilot-empty-cart-artifacts
+          path: .tmp/demo-workspace/.patchpilot/runs/latest/
+      - run: npm run demo:offline:tax-discount-order
+      - name: Validate and summarize tax-discount-order proof
+        run: PATCHPILOT_SUMMARY_TITLE="PatchPilot Tax Discount Order Demo Result" node scripts/write-ci-summary.mjs
+      - name: Upload tax-discount-order run artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: patchpilot-tax-discount-order-artifacts
           path: .tmp/demo-workspace/.patchpilot/runs/latest/

@@ -10,6 +10,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
+    "quality": "npm run build && npm test && npm run demo:offline && npm run start -- inspect-runs",
     "start": "node dist/cli.js",
     "demo": "npm run build && node dist/cli.js demo",
     "demo:offline": "npm run build && node dist/cli.js demo --offline"

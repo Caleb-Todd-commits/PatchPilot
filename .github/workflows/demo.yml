@@ -15,3 +15,10 @@ jobs:
       - run: npm install
       - run: npm test
       - run: npm run demo:offline
+      - name: Validate and summarize PatchPilot proof
+        run: node scripts/write-ci-summary.mjs
+      - name: Upload PatchPilot run artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: patchpilot-demo-artifacts
+          path: .tmp/demo-workspace/.patchpilot/runs/latest/

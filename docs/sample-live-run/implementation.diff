@@ -1,0 +1,11 @@
+===================================================================
+--- a/src/cart.ts
++++ b/src/cart.ts
+@@ -1,6 +1,5 @@
+ export type CartItem = { price: number; quantity: number };
+ 
+ export function calculateTotal(items: CartItem[]): number {
+-  const [first, ...rest] = items;
+-  return rest.reduce((sum, item) => sum + item.price * item.quantity, first!.price * first!.quantity);
++  return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+ }

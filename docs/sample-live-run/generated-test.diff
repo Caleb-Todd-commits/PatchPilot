@@ -1,0 +1,13 @@
+===================================================================
+--- a/tests/cart.test.ts
++++ b/tests/cart.test.ts
+@@ -10,4 +10,9 @@
+       ])
+     ).toBe(39);
+   });
++
++  it("returns 0 for an empty cart", () => {
++    expect(() => calculateTotal([])).not.toThrow();
++    expect(calculateTotal([])).toBe(0);
++  });
+ });

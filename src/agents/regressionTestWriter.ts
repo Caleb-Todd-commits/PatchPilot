@@ -53,11 +53,11 @@ export async function writeRegressionTest({
     taskName: "regression_test_generation",
     schema: RegressionTestSchema,
     system:
-      "You are PatchPilot's regression test generation agent. Return a full-file rewrite for one existing test file. Preserve existing imports and tests. Add only the minimum regression test needed. Use only paths that exist in the selected files. Do not include markdown.",
+      "You are PatchPilot's regression test generation agent. Return a full-file rewrite for one existing test file. Preserve existing imports and tests. Add only the minimum regression test needed. Assert the expected fixed behavior from the bug report, not the current broken behavior. The generated test must fail on the current implementation and pass after the intended fix. If the report says a value should be returned but the current behavior throws, assert the returned value; do not assert that it throws. Use only paths that exist in the selected files. Do not include markdown.",
     user: JSON.stringify(
       {
         instructions:
-          "Create a failing regression test for the reported bug by rewriting one test file in full. Return JSON shaped as { file, testName, newFileContent, rationale }.",
+          "Create a failing regression test for the reported bug by rewriting one test file in full. The test should encode the Expected behavior from the bug report. Do not write a test that passes because it matches the Actual broken behavior. Return JSON shaped as { file, testName, newFileContent, rationale }.",
         expectedShape: {
           file: "tests/cart.test.ts",
           testName: "returns 0 for an empty cart",

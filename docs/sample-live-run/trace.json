@@ -1,0 +1,120 @@
+{
+  "runId": "sample-live-run",
+  "startedAt": "2026-05-08T18:59:19.117Z",
+  "completedAt": "2026-05-08T18:59:31.345Z",
+  "mode": "live",
+  "model": "gpt-4.1-mini",
+  "openaiCalls": [
+    "file_selection",
+    "regression_test_generation",
+    "implementation_patch_generation"
+  ],
+  "issuePath": "issues/empty-cart.md",
+  "repoPath": ".tmp/demo-workspace",
+  "steps": [
+    {
+      "name": "read_bug_report",
+      "status": "passed",
+      "summary": "Loaded bug report markdown.",
+      "output": {
+        "issuePath": "issues/empty-cart.md"
+      }
+    },
+    {
+      "name": "inspect_repo",
+      "status": "passed",
+      "summary": "Inspected 9 repo files.",
+      "output": {
+        "fileCount": 9
+      }
+    },
+    {
+      "name": "run_baseline_tests",
+      "status": "passed",
+      "summary": "Baseline test command passed before PatchPilot changes.",
+      "output": {
+        "command": "npm test",
+        "exitCode": 0,
+        "passed": true
+      }
+    },
+    {
+      "name": "select_files",
+      "status": "passed",
+      "summary": "Selected 2 relevant files.",
+      "output": {
+        "relevantFiles": [
+          {
+            "path": "src/cart.ts",
+            "role": "source",
+            "reason": "Contains calculateTotal implementation that crashes on empty arrays."
+          },
+          {
+            "path": "tests/cart.test.ts",
+            "role": "test",
+            "reason": "Contains tests for calculateTotal but currently lacks a test for empty cart case."
+          }
+        ]
+      }
+    },
+    {
+      "name": "generate_regression_test",
+      "status": "passed",
+      "summary": "Generated regression test returns 0 for an empty cart.",
+      "output": {
+        "file": "tests/cart.test.ts",
+        "testName": "returns 0 for an empty cart",
+        "rationale": "Adds a regression test for the empty cart bug."
+      }
+    },
+    {
+      "name": "apply_regression_test",
+      "status": "passed",
+      "summary": "Applied regression test rewrite to tests/cart.test.ts.",
+      "output": {
+        "file": "tests/cart.test.ts",
+        "backupCreated": true
+      }
+    },
+    {
+      "name": "run_tests_before_fix",
+      "status": "failed",
+      "summary": "Test command failed as expected after regression test.",
+      "output": {
+        "command": "npm test",
+        "exitCode": 1,
+        "passed": false
+      }
+    },
+    {
+      "name": "generate_patch",
+      "status": "passed",
+      "summary": "Generated implementation patch for src/cart.ts.",
+      "output": {
+        "file": "src/cart.ts",
+        "strategy": "rewrite_file",
+        "rationale": "Adds an initial accumulator value so empty carts return 0."
+      }
+    },
+    {
+      "name": "apply_implementation_patch",
+      "status": "passed",
+      "summary": "Applied implementation rewrite to src/cart.ts.",
+      "output": {
+        "file": "src/cart.ts",
+        "backupCreated": true
+      }
+    },
+    {
+      "name": "run_tests_after_fix",
+      "status": "passed",
+      "summary": "Test command passed after fix.",
+      "output": {
+        "command": "npm test",
+        "exitCode": 0,
+        "passed": true
+      }
+    }
+  ],
+  "finalStatus": "passed"
+}

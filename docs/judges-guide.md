@@ -2,11 +2,17 @@
 
 ## Run
 
-Fast demo, no API key:
+Fast deterministic demo, no API key:
 
 ```bash
 npm install
 npm run demo:offline
+```
+
+Full local quality gate:
+
+```bash
+npm run quality
 ```
 
 Live OpenAI demo:
@@ -42,12 +48,17 @@ Open:
 - PatchPilot writes the implementation patch
 - the same test command passes after the fix
 - trace, test output, diffs, learned regression, and report are persisted
+- CI validates the generated trace and required artifacts before publishing the workflow summary
 
 ## What Proves OpenAI Is Used
 
 `npm run demo` uses live OpenAI mode for file selection, regression test generation, and implementation patch generation. The terminal prints the enabled model and each OpenAI decision point as it completes. `trace.json` records `mode`, `model`, and `openaiCalls` without logging the API key.
 
-The model outputs are validated with Zod before PatchPilot writes files. `npm run demo:offline` is the reproducibility demo and does not require an API key.
+The model outputs are validated with Zod before PatchPilot writes files. Sanitized sample live artifacts are checked in under `docs/sample-live-run/`. `npm run demo:offline` is the reproducibility demo and does not require an API key.
+
+## Why Offline Mode Exists
+
+Offline mode lets judges verify the system mechanics quickly and deterministically without creating an API key: baseline tests, generated regression failure, implementation patch, final passing tests, trace, diffs, learned regression, and report generation.
 
 ## Known Limitations
 

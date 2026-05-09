@@ -60,3 +60,11 @@ The important thing is not the canned offline AI output. The important thing is 
 4. writes the implementation patch
 5. reruns the same test command and captures the pass
 6. writes `trace.json`, diffs, `learned-regression.json`, and a PR-ready report
+
+## 4. Optional: Show The Quality Gate
+
+```bash
+npm run quality
+```
+
+This runs the build, unit tests, offline demo, and latest-run inspection in one command. In CI, `scripts/write-ci-summary.mjs` also validates the generated trace and required artifacts before writing the GitHub Actions summary.

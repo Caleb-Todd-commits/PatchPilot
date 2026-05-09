@@ -49,6 +49,12 @@ function printRunSummary(args: {
   console.log(`Artifacts: ${args.artifactsDir}`);
 }
 
+function openAICallsForMode(mode: PatchPilotMode): string[] {
+  return mode === "live"
+    ? ["file_selection", "regression_test_generation", "implementation_patch_generation"]
+    : [];
+}
+
 function preview(text: string, maxLength = 500): string {
   return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 }
@@ -164,6 +170,9 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
       const report = writeRepairReport({
         finalStatus: "failed",
         issueText,
+        mode: options.mode,
+        model: options.mode === "live" ? model : undefined,
+        openaiCalls: openAICallsForMode(options.mode),
         baselinePassed,
         beforeFailed,
         afterPassed,
@@ -289,6 +298,9 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
         issueText,
         selection: selectedFiles,
         regression: generatedRegression,
+        mode: options.mode,
+        model: options.mode === "live" ? model : undefined,
+        openaiCalls: openAICallsForMode(options.mode),
         baselinePassed,
         beforeFailed,
         afterPassed,
@@ -410,6 +422,9 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
       selection: selectedFiles,
       regression: generatedRegression,
       implementation: generatedImplementation,
+      mode: options.mode,
+      model: options.mode === "live" ? model : undefined,
+      openaiCalls: openAICallsForMode(options.mode),
       baselinePassed,
       beforeFailed,
       afterPassed,
@@ -444,6 +459,9 @@ export async function runPatchPilot(options: PipelineOptions): Promise<PipelineR
       selection,
       regression,
       implementation,
+      mode: options.mode,
+      model: options.mode === "live" ? model : undefined,
+      openaiCalls: openAICallsForMode(options.mode),
       baselinePassed,
       beforeFailed,
       afterPassed

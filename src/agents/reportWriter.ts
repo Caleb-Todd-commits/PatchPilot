@@ -8,6 +8,9 @@ type ReportArgs = {
   selection?: FileSelection;
   regression?: RegressionTest;
   implementation?: ImplementationPatch;
+  mode: "live" | "offline";
+  model?: string;
+  openaiCalls?: string[];
   baselinePassed: boolean;
   beforeFailed: boolean;
   afterPassed: boolean;
@@ -35,6 +38,9 @@ export function writeRepairReport({
   selection,
   regression,
   implementation,
+  mode,
+  model,
+  openaiCalls = [],
   baselinePassed,
   beforeFailed,
   afterPassed,
@@ -56,6 +62,10 @@ export function writeRepairReport({
   const rootCause = implementation
     ? `The failing behavior came from ${sourceFile}: ${implementation.rationale}`
     : "PatchPilot did not reach implementation planning, so no root cause was confirmed.";
+  const openAIUsage =
+    mode === "live"
+      ? `Mode: live\nModel: ${model ?? "unknown"}\nOpenAI decision steps:\n${openaiCalls.map((call) => `- ${call}`).join("\n") || "- none recorded"}`
+      : "Mode: offline deterministic demo\nOpenAI calls: none\nPurpose: verifies the system mechanics without requiring an API key.";
 
   return `# PatchPilot Repair Report
 
@@ -72,6 +82,9 @@ ${rootCause}
 ${relevantFiles}
 - Regression test generated: ${regression ? `${regression.testName} in ${regression.file}` : "not generated"}
 - Implementation patched: ${implementation ? `${implementation.file} (${implementation.rationale})` : "not patched"}
+
+## OpenAI Usage
+${openAIUsage}
 
 ## Red-Green Verification
 - Baseline test suite passed before changes: ${baselinePassed ? "yes" : "no"}${baselineExitCode === undefined ? "" : ` (exit ${baselineExitCode})`}
